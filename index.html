@@ -232,8 +232,9 @@
 
             const keypoints = pose.keypoints;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#FF0000';
-            ctx.strokeStyle = '#00FFFF';
+            ctx.strokeStyle = '#00FF00'; // green skeleton
+            ctx.fillStyle = '#00FF00';   // green joints
+
             ctx.lineWidth = 2;
 
             // Draw keypoints (dots)
