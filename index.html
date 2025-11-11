@@ -115,6 +115,15 @@
                 <div class="mt-4 text-center text-sm font-medium text-gray-600">
                     Total Samples Collected: <span id="sample-count" class="font-bold text-indigo-600">0</span>
                 </div>
+                
+                <div class="grid grid-cols-2 gap-2 mt-4">
+                    <button id="clear-last-btn" class="bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-2 rounded-lg transition shadow-md hover:shadow-lg disabled:opacity-50 text-sm" disabled>
+                        Clear Last Sample
+                    </button>
+                    <button id="clear-all-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-2 rounded-lg transition shadow-md hover:shadow-lg disabled:opacity-50 text-sm" disabled>
+                        Clear ALL Data
+                    </button>
+                </div>
 
                 <button id="download-dataset-btn" class="w-full mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-md hover:shadow-lg disabled:opacity-50" disabled>
                     Download Dataset (.json)
@@ -154,6 +163,8 @@
         const sampleCountEl = document.getElementById('sample-count');
         const videoPlayPauseBtn = document.getElementById('video-play-pause-btn');
         const fileInput = document.getElementById('file-input');
+        const clearLastBtn = document.getElementById('clear-last-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
         
         const STORAGE_KEY = 'yogaPoseDataset'; // Key for localStorage
 
@@ -184,6 +195,8 @@
             saveBtn.textContent = `Save Pose Sample (${dataset.length})`;
             saveBtn.disabled = detector === null; // Enable only after model loads
             downloadBtn.disabled = dataset.length === 0;
+            clearLastBtn.disabled = dataset.length === 0;
+            clearAllBtn.disabled = dataset.length === 0;
         };
 
         /** Loads data from localStorage. */
@@ -455,6 +468,29 @@
         }
 
         // --- MAIN APPLICATION ACTIONS (UPDATED FOR LOCAL STORAGE) ---
+          // --- DATA MANAGEMENT FUNCTIONS ---
+
+        /** Removes the last sample collected. */
+        clearLastBtn.addEventListener('click', () => {
+            if (dataset.length > 0) {
+                const lastSample = dataset.pop();
+                saveDatasetToLocalStorage();
+                updateSampleCount();
+                statusEl.textContent = `Removed last saved sample for "${lastSample.label}". Total: ${dataset.length}`;
+            } else {
+                statusEl.textContent = "Dataset is already empty.";
+            }
+        });
+
+        /** Clears the entire dataset. */
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm("Are you sure you want to clear ALL collected data? This action cannot be undone.")) {
+                dataset = [];
+                localStorage.removeItem(STORAGE_KEY);
+                updateSampleCount();
+                statusEl.textContent = "All collected data has been cleared from local storage. Start fresh!";
+            }
+        });
 
         /** Saves the currently detected pose sample to dataset and localStorage. */
         saveBtn.addEventListener('click', () => {
